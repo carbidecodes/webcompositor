@@ -1,4 +1,6 @@
-import { init } from './channel/connection.ts'
+import { init } from '/channel/connection.ts'
 
+const connection = init()
 
-init()
+connection.onOpen(() => console.log('connected'))
+connection.onMessage(msg => console.log({msg}))
