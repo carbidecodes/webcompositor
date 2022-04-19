@@ -1,7 +1,7 @@
 import { type Action } from 'common/utils/types.ts'
 
 export const init = () => {
-    const endpoint = 'ws://localhost:8000'
+    const endpoint = 'ws://localhost:8001/ws'
     const ws = new WebSocket(endpoint)
 
     return {
