@@ -13,17 +13,6 @@ const event = () => {
 
 const e = event()
 
-// const wss = new WebSocketServer(8000)
-
-// wss.on('connection', ws => {
-//     ws.on('message', msg => {
-//         console.log({msg})
-//         ws.send(msg)
-//     })
-
-//     e.on('greet', () => ws.send('greeted'))
-// })
-
 serve({
     '/foo' : respond(_ => {
         e.emit('bar')
