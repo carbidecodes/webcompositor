@@ -1,6 +1,8 @@
 import serve from './serve.ts'
 import { respond, handle } from './utils/handler.ts'
 import { websocket } from './utils/upgrade.ts'
+import { tap } from 'common/utils/func.ts'
+import { pipe } from 'https://esm.sh/@psxcode/compose'
 
 const event = () => {
     const evt = new EventTarget()
@@ -46,6 +48,20 @@ serve({
                     console.log('sc detail', {detail})
                     send(ws, JSON.stringify(detail))
                 })
+
+                ws.addEventListener(
+                    'message',
+                    pipe(
+                        ({data}) => data,
+                        JSON.parse,
+                        tap,
+                        data =>
+                            e.emit('soundcloud', {
+                                evtName: 'currentSong',
+                                data
+                            })
+                    )
+                )
 
                 console.log("got ws connection")
             })

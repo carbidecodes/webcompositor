@@ -1,6 +1,8 @@
 import { init } from '/channel/connection.ts'
 import { Read } from 'utils/dom.ts'
-import { tap, compose } from 'common/utils/func.ts'
+import { tap } from 'common/utils/func.ts'
+
+import { pipe } from 'https://esm.sh/@psxcode/compose'
 
 const { select, observe, query, text } = Read
 
@@ -25,19 +27,19 @@ const extract = (node: Element) => {
 const tapA = (x: any, label = '') => tap(x, 'asdf - ' + label)
 
 const handleUpdate = (record: MutationRecord) => {
-    switch (record.type) {
-        case 'childList':
-            tapA(extract(playback))
-            break;
-        default:
-            tapA({record}, 'unknown record')
-            
+    if (record.type === 'childList') {
+        pipe(
+            extract,
+            tapA,
+            JSON.stringify,
+            connection.send
+        )(playback)
     }
 }
 
 observe(
     tapA(playback),
-    compose(tapA, handleUpdate),
+    pipe(tapA, handleUpdate),
     {
         childList: true
     }

@@ -1,13 +1,16 @@
 import { init } from '/channel/connection.ts'
 import { getMediaSource } from './layer.ts'
-import { select, el, at, text } from './utils/dom.ts'
+import { Create, Read } from './utils/dom.ts'
 import { tap } from 'common/utils/func.ts'
 
+const { el, at, text } = Create
+const { select } = Read
 
 const root = select('div#container')
 
 const connection = init()
 
+const toastRoot = el('div', 'layer')
 const toast = ({
     titleText,
     bodyText,
@@ -51,10 +54,10 @@ const handleMsg = ({
                 bodyText: `${artist} - ${title}`
             })
 
-            at(root, [toastEl])
+            at(toastRoot, [toastEl])
 
             setTimeout(() => {
-                root.removeChild(toastEl)
+                toastRoot.removeChild(toastEl)
             }, 3000)
         break
     }
@@ -76,4 +79,10 @@ button.onclick = async () => {
 
 button.innerText = 'get media'
 
-at(root, [video, button])
+at(root,
+    [ at(el('div', 'layer'),
+        [ video
+        , button
+        ])
+    , toastRoot
+    ])

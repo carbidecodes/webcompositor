@@ -6,6 +6,7 @@ export const init = () => {
 
     return {
         onOpen: (fn: Action<void>) => ws.addEventListener('open', () => fn()),
-        onMessage: (fn: Action<any>) => ws.addEventListener('message', fn)
+        onMessage: (fn: Action<any>) => ws.addEventListener('message', fn),
+        send: (data: any) => ws.send(data)
     }
 }
