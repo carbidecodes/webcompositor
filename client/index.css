@@ -1,7 +1,18 @@
+:root {
+    --unit: 8px;
+}
+
 body {
     margin: 0px;
 }
 
 div#container {
-    background-color: red;
+    background-color: #f3f3f3;
+}
+
+div.toast {
+    background-color: #cacaca;
+    border-radius: var(--unit);
+    padding: var(--unit);
+    box-shadow: 1px 1px var(--unit) rgba(0,0,0,0.4);
 }

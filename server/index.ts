@@ -6,22 +6,47 @@ const event = () => {
     const evt = new EventTarget()
 
     return {
-        emit: (msg: any) => evt.dispatchEvent(new Event(msg)),
-        on: (evName: string, handler: EventListener) => evt.addEventListener(evName, handler)
+        emit: (evName: string, data: any) =>
+            evt.dispatchEvent(new CustomEvent(evName, {detail: data})),
+
+        on: (evName: string, handler: EventListener) =>
+            evt.addEventListener(evName, handler)
     }
 }
 
 const e = event()
 
+const send = (ws: WebSocket, data: any) => {
+    if (ws.readyState !== WebSocket.OPEN) {
+        console.error('Socket not open')
+    } else {
+        ws.send(data)
+    }
+}
+
+const queryParams = (urlString: string) =>
+    new URL(urlString).searchParams
+
 serve({
-    '/foo' : respond(_ => {
-        e.emit('bar')
-        return 'hi'
+    '/soundcloud' : respond(req => {
+        // eh
+        const params = queryParams(req.url)
+
+        const title = params.get('title')
+        const artist = params.get('artist')
+
+        e.emit('soundcloud', {evtName: 'currentSong', data: { title, artist }})
+
+        return 'k'
     }),
     '/ws' :
         handle(
             websocket(ws => {
-                e.on('bar', () => ws.send('got a message'))
+                e.on('soundcloud', ({detail}: any) => {
+                    console.log('sc detail', {detail})
+                    send(ws, JSON.stringify(detail))
+                })
+
                 console.log("got ws connection")
             })
         )
