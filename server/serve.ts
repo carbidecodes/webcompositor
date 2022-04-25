@@ -1,6 +1,6 @@
 import type { RouteMap, Handler } from './route.ts'
 import { route } from './route.ts'
-import { port } from 'common/utils/env.ts'
+import { port } from './utils/config.ts'
 
 const defaultHandler: Handler = async reqEv => {
     reqEv.respondWith(new Response(`oops there's nothing here`))
