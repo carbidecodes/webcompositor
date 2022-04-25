@@ -6,8 +6,6 @@ import { tap } from 'common/utils/func.ts'
 const { el, at, text } = Create
 const { select } = Read
 
-const TOAST_SHOW_DURATION_MS = 300000
-
 const root = select('div#container')
 
 const connection = init()
@@ -67,6 +65,9 @@ const handleMsg = ({
         case 'currentSong':
             const toastEl = showSongToast(data)
 
+            const chars : number= data.artist.length + data.title.length
+            const time = Math.max(chars * 150, 3000)
+
             setTimeout(() => {
                 toastEl.classList.remove('toast--in')
                 requestAnimationFrame(
@@ -76,7 +77,7 @@ const handleMsg = ({
                     () => toastRoot.removeChild(toastEl),
                     { once: true }
                 )
-            }, TOAST_SHOW_DURATION_MS)
+            }, time)
         break
     }
 }
