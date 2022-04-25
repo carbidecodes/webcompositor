@@ -1,5 +1,7 @@
 :root {
     --unit: 8px;
+    --ease: cubic-bezier(.49,0,.37,.99);
+    --rate: .25s;
 }
 
 body {
@@ -11,8 +13,56 @@ div#container {
 }
 
 div.toast {
-    background-color: #cacaca;
     border-radius: var(--unit);
     padding: var(--unit);
     box-shadow: 1px 1px var(--unit) rgba(0,0,0,0.4);
+    margin: var(--unit);
+    background-color: rgba(255,255,255,0.96);
+    backdrop-filter: blur(2px);
+
+    display: flex;
+    position: relative;
+    top: 0;
+}
+
+div.toast--body {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-around;
+}
+
+div.layer {
+    position: absolute;
+}
+
+div.toast img {
+    margin: calc(var(--unit) / 2);
+}
+
+.toast--out {
+    animation: fadeout var(--rate) var(--ease);
+}
+
+.toast--in {
+    animation: fadein var(--rate) var(--ease);
+}
+
+@keyframes fadeout {
+    to {
+        opacity: 0;
+    }
+
+    from {
+        opacity: 1.0;
+    }
+}
+
+@keyframes fadein {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1.0;
+    }
 }

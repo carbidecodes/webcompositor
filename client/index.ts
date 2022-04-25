@@ -6,6 +6,8 @@ import { tap } from 'common/utils/func.ts'
 const { el, at, text } = Create
 const { select } = Read
 
+const TOAST_SHOW_DURATION_MS = 300000
+
 const root = select('div#container')
 
 const connection = init()
@@ -20,7 +22,7 @@ const toast = ({
     bodyText: string
     imgUrl?: string
 }) => {
-    const img_ = 
+    const img_ : Element[] = 
         (() => {
             if (imgUrl !== undefined) {
                 const img = el('img')
@@ -31,12 +33,27 @@ const toast = ({
             }
         })()
 
-    return at(el('div', 'toast'), [
-        text(titleText),
-        at(el('div'), [
-            text(bodyText)
-        ].concat(img_))
-    ])
+    return at(el('div', 'toast toast--in'), img_.concat([
+        at(el('div', 'toast--body'),
+            [ text(titleText)
+            , text(bodyText)
+            ])
+    ]))
+}
+
+const showSongToast = (
+    { artist, title, imgUrl }:
+    { artist: string, title: string, imgUrl: string }
+) => {
+    const toastEl = toast({
+        titleText: 'Current song',
+        bodyText: `${artist} - ${title}`,
+        imgUrl
+        })
+
+    at(toastRoot, [ toastEl ], true)
+
+    return toastEl
 }
 
 const handleMsg = ({
@@ -48,17 +65,18 @@ const handleMsg = ({
 }) => {
     switch (evtName) {
         case 'currentSong':
-            const { artist, title } = data
-            const toastEl = toast({
-                titleText: 'Current song',
-                bodyText: `${artist} - ${title}`
-            })
-
-            at(toastRoot, [toastEl])
+            const toastEl = showSongToast(data)
 
             setTimeout(() => {
-                toastRoot.removeChild(toastEl)
-            }, 3000)
+                toastEl.classList.remove('toast--in')
+                requestAnimationFrame(
+                    () => toastEl.classList.add('toast--out')
+                )
+                toastEl.addEventListener('animationend',
+                    () => toastRoot.removeChild(toastEl),
+                    { once: true }
+                )
+            }, TOAST_SHOW_DURATION_MS)
         break
     }
 }
@@ -86,3 +104,9 @@ at(root,
         ])
     , toastRoot
     ])
+
+// TODO remove
+// showSongToast({artist: 'carbide', title: 'foo'})
+// showSongToast({artist: 'carbide', title: 'bar'})
+// showSongToast({artist: 'carbide', title: 'baz'})
+// showSongToast({artist: 'carbide', title: 'quix'})

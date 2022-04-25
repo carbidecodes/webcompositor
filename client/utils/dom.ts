@@ -7,8 +7,12 @@ export namespace Create {
 
         return el
     }
-    export const at = (node: Element, children: Array<Element>) => {
-        children.forEach(x => node.appendChild(x))
+    export const at = (node: Element, children: Array<Element>, reverse=false) => {
+        if (reverse) {
+            children.forEach(x => node.prepend(x))
+        } else {
+            children.forEach(x => node.appendChild(x))
+        }
         return node
     }
     export const text = (txt: string) => {

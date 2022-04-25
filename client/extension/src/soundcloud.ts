@@ -17,10 +17,17 @@ const playback = select('div.playbackSoundBadge')
 const extract = (node: Element) => {
     let q = query(node)
 
+    const cleanUrlString // url("foo") => 'foo'
+        = (urlString: string) =>
+        urlString // probably not ideal
+            .replace('url(','')
+            .replace(')','')
+            .replaceAll('"','')
+
     return {
         artist: text(q<HTMLAnchorElement>('a.sc-link-secondary')!),
         title: text(q<HTMLSpanElement>('a.sc-link-primary span[aria-hidden=true]')!),
-        imgUrl: q<HTMLSpanElement>('div.image span')!.style.backgroundImage
+        imgUrl: cleanUrlString(q<HTMLSpanElement>('div.image span')!.style.backgroundImage)
     }
 }
 
