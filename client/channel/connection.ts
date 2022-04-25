@@ -1,5 +1,5 @@
 import { type Action } from 'common/utils/types.ts'
-import { host, port } from 'common/utils/env.ts'
+import { host, port } from 'utils/env.ts'
 
 export const init = () => {
     const endpoint = `ws://${host}:${port}/ws`
