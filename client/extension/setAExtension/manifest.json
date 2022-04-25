@@ -1,0 +1,16 @@
+{
+    "name": "set A",
+    "description": "",
+    "version": "0.1",
+    "manifest_version": 3,
+    "action": {
+        "default_popup": "popup.html"
+    },
+    "content_scripts": [
+        {
+            "matches": ["https://*/*"],
+            "js": ["./out/setA.js"]
+        }
+    ],
+    "permissions": ["activeTab", "scripting"]
+}
