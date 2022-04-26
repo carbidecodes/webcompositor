@@ -6,48 +6,58 @@ import { pipe } from 'https://esm.sh/@psxcode/compose'
 
 const { select, observe, query, text } = Read
 
-const connection = init()
-connection.onOpen(() => console.log('connected.'))
-connection.onMessage(tap)
+window.chrome.storage.sync.get('a', (isA: boolean) => {
+    const connection = init({host: 'localhost', port: isA ? 8002 : 8001})
 
-document.body.style.backgroundColor = 'red'
+    connection.onOpen(() => console.log('connected.'))
+    connection.onMessage(tap)
 
-const playback = select('div.playbackSoundBadge')
+    document.body.style.backgroundColor = 'red'
 
-const extract = (node: Element) => {
-    let q = query(node)
+    const playback = select('div.playbackSoundBadge')
 
-    const cleanUrlString // url("foo") => 'foo'
+    const extract = (node: Element) => {
+        let q = query(node)
+
+        const cleanUrlString // url("foo") => 'foo'
         = (urlString: string) =>
-        urlString // probably not ideal
+            urlString // probably not ideal
             .replace('url(','')
             .replace(')','')
             .replaceAll('"','')
 
-    return {
-        artist: text(q<HTMLAnchorElement>('a.sc-link-secondary')!),
-        title: text(q<HTMLSpanElement>('a.sc-link-primary span[aria-hidden=true]')!),
-        imgUrl: cleanUrlString(q<HTMLSpanElement>('div.image span')!.style.backgroundImage)
+        return {
+            artist: text(q<HTMLAnchorElement>('a.sc-link-secondary')!),
+            title: text(q<HTMLSpanElement>('a.sc-link-primary span[aria-hidden=true]')!),
+            imgUrl: cleanUrlString(q<HTMLSpanElement>('div.image span')!.style.backgroundImage)
+        }
     }
+
+    const tapA = (x: any, label = '') => tap(x, 'asdf - ' + label)
+
+    const handleUpdate = (record: MutationRecord) => {
+        if (record.type === 'childList') {
+            pipe(
+                extract,
+                tapA,
+                JSON.stringify,
+                connection.send
+            )(playback)
+        }
+    }
+
+    observe(
+        tapA(playback),
+        pipe(tapA, handleUpdate),
+        {
+            childList: true
+        }
+    )
+})
+
+// Hax
+// literally only need to call this once
+const setA = (a: boolean) => {
+    window.chrome.storage.set({a})
 }
 
-const tapA = (x: any, label = '') => tap(x, 'asdf - ' + label)
-
-const handleUpdate = (record: MutationRecord) => {
-    if (record.type === 'childList') {
-        pipe(
-            extract,
-            tapA,
-            JSON.stringify,
-            connection.send
-        )(playback)
-    }
-}
-
-observe(
-    tapA(playback),
-    pipe(tapA, handleUpdate),
-    {
-        childList: true
-    }
-)

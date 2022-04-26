@@ -1,7 +1,6 @@
 import { type Action } from 'common/utils/types.ts'
-import { host, port } from 'utils/env.ts'
 
-export const init = () => {
+export const init = ({host, port}: {host: string, port: number}) => {
     const endpoint = `ws://${host}:${port}/ws`
     const ws = new WebSocket(endpoint)
 

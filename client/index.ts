@@ -2,13 +2,14 @@ import { init } from '/channel/connection.ts'
 import { getMediaSource } from './layer.ts'
 import { Create, Read } from './utils/dom.ts'
 import { tap } from 'common/utils/func.ts'
+import { host, port } from 'utils/env.ts'
 
 const { el, at, text } = Create
 const { select } = Read
 
 const root = select('div#container')
 
-const connection = init()
+const connection = init({host, port})
 
 const toastRoot = el('div', 'layer')
 const toast = ({

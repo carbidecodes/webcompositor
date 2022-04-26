@@ -3,11 +3,14 @@
     "description": "",
     "version": "0.1",
     "manifest_version": 3,
+    "action": {
+        "default_popup": "./toggle.html"
+    },
     "content_scripts": [
         {
             "matches": ["https://soundcloud.com/*"],
             "js": ["./out/soundcloud.js"]
         }
     ],
-    "permissions": ["activeTab", "scripting"]
+    "permissions": ["activeTab", "scripting", "storage"]
 }
