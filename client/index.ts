@@ -91,6 +91,9 @@ const video: HTMLVideoElement = el('video')
 const button = el('button')
 
 button.onclick = async () => {
+    video.style.width = '1920px'
+    video.style.height = '1080px'
+
     video.srcObject = await getMediaSource()
     video.onloadedmetadata = () => video.play()
 
