@@ -6,34 +6,40 @@ import { pipe } from 'https://esm.sh/@psxcode/compose'
 
 const { select, observe, query, text } = Read
 
-window.chrome.storage.sync.get('a', (isA: boolean) => {
-    const connection = init({host: 'localhost', port: isA ? 8002 : 8001})
+const extract = (node: Element) => {
+    let q = query(node)
+
+    const cleanUrlString // url("foo") => 'foo'
+    = (urlString: string) =>
+        urlString // probably not ideal
+        .replace('url(','')
+        .replace(')','')
+        .replaceAll('"','')
+
+    return {
+        artist: text(q<HTMLAnchorElement>('a.sc-link-secondary')!),
+        title: text(q<HTMLSpanElement>('a.sc-link-primary span[aria-hidden=true]')!),
+        imgUrl: cleanUrlString(q<HTMLSpanElement>('div.image span')!.style.backgroundImage)
+    }
+}
+
+const tapA = (x: any, label = '') => tap(x, 'asdf - ' + label)
+
+const connect = async () => {
+    const { a } = await window.chrome.storage.sync.get('a')
+
+    const connection = init({host: 'localhost', port: a ? 8002 : 8001})
 
     connection.onOpen(() => console.log('connected.'))
     connection.onMessage(tap)
 
-    document.body.style.backgroundColor = 'red'
+    return connection
+}
+
+(async () => {
+    const connection = await connect()
 
     const playback = select('div.playbackSoundBadge')
-
-    const extract = (node: Element) => {
-        let q = query(node)
-
-        const cleanUrlString // url("foo") => 'foo'
-        = (urlString: string) =>
-            urlString // probably not ideal
-            .replace('url(','')
-            .replace(')','')
-            .replaceAll('"','')
-
-        return {
-            artist: text(q<HTMLAnchorElement>('a.sc-link-secondary')!),
-            title: text(q<HTMLSpanElement>('a.sc-link-primary span[aria-hidden=true]')!),
-            imgUrl: cleanUrlString(q<HTMLSpanElement>('div.image span')!.style.backgroundImage)
-        }
-    }
-
-    const tapA = (x: any, label = '') => tap(x, 'asdf - ' + label)
 
     const handleUpdate = (record: MutationRecord) => {
         if (record.type === 'childList') {
@@ -53,11 +59,5 @@ window.chrome.storage.sync.get('a', (isA: boolean) => {
             childList: true
         }
     )
-})
-
-// Hax
-// literally only need to call this once
-const setA = (a: boolean) => {
-    window.chrome.storage.set({a})
-}
+})()
 
