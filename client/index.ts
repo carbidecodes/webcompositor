@@ -93,22 +93,38 @@ connection.onMessage(({data}) =>
 const video: HTMLVideoElement = el('video')
 const button = el('button')
 
-button.onclick = async () => {
-    video.style.width = '1920px'
-    video.style.height = '1080px'
-
-    video.srcObject = await getMediaSource()
-    video.onloadedmetadata = () => video.play()
-
-    return void(0)
+type Shortcuts = {
+    [key: string] : () => void
 }
 
-button.innerText = 'get media'
+const shortcuts: Shortcuts = {
+    s: async () => {
+        video.style.width = '1920px'
+        video.style.height = '1080px'
+
+        video.srcObject = await getMediaSource()
+        video.onloadedmetadata = () => video.play()
+    }
+}
+
+document.addEventListener('keyup', async ev => {
+    if (ev.key in shortcuts) {
+        shortcuts[ev.key]()
+    }
+})
+
+const on = <T>(el: T, fn: (_:T) => void) : T => {
+    fn(el)
+    return el
+}
 
 at(root,
     [ at(el('div', 'layer'),
         [ video
-        , button
+        ])
+    , at(el('div', 'layer camera expand'),
+        [ on(el('img'), v => v.src = "http://localhost:8081/video")
         ])
     , toastRoot
+    , button
     ])
