@@ -4,6 +4,8 @@ import { Create, Read } from './utils/dom.ts'
 import { tap } from 'common/utils/func.ts'
 import { host, port } from 'utils/env.ts'
 
+const MIN_TOAST_TIME = 5000
+
 const { el, at, text } = Create
 const { select } = Read
 
@@ -11,7 +13,8 @@ const root = select('div#container')
 
 const connection = init({host, port})
 
-const toastRoot = el('div', 'layer')
+const toastRoot = el('div', 'layer flex-column')
+
 const toast = ({
     titleText,
     bodyText,
@@ -45,8 +48,8 @@ const showSongToast = (
     { artist: string, title: string, imgUrl: string }
 ) => {
     const toastEl = toast({
-        titleText: 'Current song',
-        bodyText: `${artist} - ${title}`,
+        titleText: artist,
+        bodyText: title,
         imgUrl
         })
 
@@ -67,7 +70,7 @@ const handleMsg = ({
             const toastEl = showSongToast(data)
 
             const chars : number= data.artist.length + data.title.length
-            const time = Math.max(chars * 150, 3000)
+            const time = Math.max(chars * 150, MIN_TOAST_TIME)
 
             setTimeout(() => {
                 toastEl.classList.remove('toast--in')
@@ -109,9 +112,3 @@ at(root,
         ])
     , toastRoot
     ])
-
-// TODO remove
-// showSongToast({artist: 'carbide', title: 'foo'})
-// showSongToast({artist: 'carbide', title: 'bar'})
-// showSongToast({artist: 'carbide', title: 'baz'})
-// showSongToast({artist: 'carbide', title: 'quix'})

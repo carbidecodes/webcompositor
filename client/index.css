@@ -1,11 +1,14 @@
 :root {
-    --unit: 8px;
+    --unit: 12px;
     --ease: cubic-bezier(.49,0,.37,.99);
     --rate: .25s;
 }
 
 body {
+    font-family: monospace;
+    font-size: calc(var(--unit)*1.6);
     margin: 0px;
+    overflow: hidden;
 }
 
 div#container {
@@ -15,10 +18,11 @@ div#container {
 div.toast {
     border-radius: var(--unit);
     padding: var(--unit);
-    box-shadow: 1px 1px var(--unit) rgba(0,0,0,0.4);
+    box-shadow: 1px 1px var(--unit) rgba(0,0,0,0.64);
     margin: var(--unit);
-    background-color: rgba(255,255,255,0.96);
-    backdrop-filter: blur(2px);
+    margin-bottom: 0px;
+    background-color: rgba(255,255,255,0.36);
+    backdrop-filter: blur(8px);
 
     display: flex;
     position: relative;
@@ -36,7 +40,19 @@ div.layer {
 }
 
 div.toast img {
-    margin: calc(var(--unit) / 2);
+    margin-right: var(--unit);
+    width: calc(var(--unit) * 4.0);
+    height: calc(var(--unit) * 4.0);
+    border-radius: calc(var(--unit) / 2);
+    border: 1px solid rgba(0,0,0,0.01);
+    box-shadow: 0px 0px calc(var(--unit) / 2) calc(var(--unit) / 4) rgba(255,255,255,0.08);
+    box-sizing: border-box;
+}
+
+.flex-column {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start
 }
 
 .toast--out {
