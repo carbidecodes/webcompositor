@@ -102,6 +102,11 @@ const handleMsg = ({
                 bodyText: data.msg
             })
             break
+
+        case 'command':
+            if (data === 'blur') {
+                video.classList.toggle('blurred')
+            }
     }
 }
 

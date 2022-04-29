@@ -10,8 +10,6 @@ export const path = (req: Request) => new URL(req.url).pathname
 // don't care about blocking
 export const route = (map: RouteMap, defaultHandler: Handler) => (requestEvent: Deno.RequestEvent) => {
     const thisPath = path(requestEvent.request)
-    console.log({thisPath})
-
     const handler = map[thisPath]
 
     if (handler !== undefined) {

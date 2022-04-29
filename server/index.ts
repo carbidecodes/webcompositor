@@ -13,8 +13,11 @@ const event = () => {
         emit: (evName: string, data: any) =>
             evt.dispatchEvent(new CustomEvent(evName, {detail: data})),
 
-        on: (evName: string, handler: EventListener) =>
+        on: (evName: string, handle: any) => {
+            const handler = ({detail}: any) => handle(detail)
+
             evt.addEventListener(evName, handler)
+        }
     }
 }
 
@@ -31,7 +34,14 @@ const send = (ws: WebSocket, data: any) => {
 const queryParams = (urlString: string) =>
     new URL(urlString).searchParams
 
-const tClient = twitchInit()
+const tClient = twitchInit({
+    current: user => `Adding twitch chat today ${user.username}`,
+    blur: () => {
+        // e.emit('command', 'blur')
+
+        return 'nah'
+    }
+})
 
 serve({
     '/soundcloud' : respond(req => {
@@ -51,6 +61,11 @@ serve({
                 e.on('soundcloud', ({detail}: any) => {
                     console.log('sc detail', {detail})
                     send(ws, detail)
+                })
+
+                e.on('command',  ({detail}: any) => {
+                    tap(detail, 'command')
+                    send(ws, { evtName: 'command', data: detail })
                 })
 
                 ws.addEventListener(
