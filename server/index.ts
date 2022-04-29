@@ -4,6 +4,8 @@ import { websocket } from './utils/upgrade.ts'
 import { tap } from 'common/utils/func.ts'
 import { pipe } from 'https://esm.sh/@psxcode/compose'
 
+import twitchInit from './twitch.ts'
+
 const event = () => {
     const evt = new EventTarget()
 
@@ -22,12 +24,14 @@ const send = (ws: WebSocket, data: any) => {
     if (ws.readyState !== WebSocket.OPEN) {
         console.error('Socket not open')
     } else {
-        ws.send(data)
+        ws.send(JSON.stringify(data))
     }
 }
 
 const queryParams = (urlString: string) =>
     new URL(urlString).searchParams
+
+const tClient = twitchInit()
 
 serve({
     '/soundcloud' : respond(req => {
@@ -46,7 +50,7 @@ serve({
             websocket(ws => {
                 e.on('soundcloud', ({detail}: any) => {
                     console.log('sc detail', {detail})
-                    send(ws, JSON.stringify(detail))
+                    send(ws, detail)
                 })
 
                 ws.addEventListener(
@@ -62,6 +66,13 @@ serve({
                             })
                     )
                 )
+
+                tClient.onMessage(data => {
+                    send(ws, {
+                        evtName: 'twitch_message',
+                        data
+                    })
+                })
 
                 console.log("got ws connection")
             })

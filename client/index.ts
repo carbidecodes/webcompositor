@@ -43,13 +43,19 @@ const toast = ({
     ]))
 }
 
-const showSongToast = (
-    { artist, title, imgUrl }:
-    { artist: string, title: string, imgUrl: string }
-) => {
+const showToast = (
+    {
+        titleText,
+        bodyText,
+        imgUrl
+    }: {
+        titleText: string
+        bodyText: string
+        imgUrl?: string
+}) => {
     const toastEl = toast({
-        titleText: artist,
-        bodyText: title,
+        titleText,
+        bodyText,
         imgUrl
         })
 
@@ -57,6 +63,11 @@ const showSongToast = (
 
     return toastEl
 }
+
+const showSongToast = (
+    { artist, title, imgUrl }:
+    { artist: string, title: string, imgUrl: string }
+) => showToast({titleText: artist, bodyText: title, imgUrl})
 
 const handleMsg = ({
     evtName,
@@ -82,13 +93,21 @@ const handleMsg = ({
                     { once: true }
                 )
             }, time)
-        break
+            break
+
+        case 'twitch_message':
+            tap(data)
+            showToast({
+                titleText: data.username,
+                bodyText: data.msg
+            })
+            break
     }
 }
 
 connection.onOpen(() => console.log('connected'))
 connection.onMessage(({data}) =>
-    handleMsg(tap(JSON.parse(data))))
+    handleMsg(tap(JSON.parse(tap(data)))))
 
 const video: HTMLVideoElement = el('video')
 
