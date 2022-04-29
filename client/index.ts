@@ -103,6 +103,15 @@ const shortcuts: Shortcuts = {
 
         video.srcObject = await getMediaSource()
         video.onloadedmetadata = () => video.play()
+    },
+    b: () => {
+        video.classList.toggle('blurred')
+    },
+    z: () => {
+        select('div.camera img')?.classList.toggle('zoomed')
+    },
+    c: () => {
+        select('div.camera img')?.classList.toggle('blurred')
     }
 }
 

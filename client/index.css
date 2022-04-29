@@ -2,7 +2,6 @@
     --unit: 12px;
     --ease: cubic-bezier(.49,0,.37,.99);
     --rate: .25s;
-
 }
 
 body {
@@ -52,6 +51,14 @@ div.toast img {
     box-sizing: border-box;
 }
 
+video {
+    transition: filter .15s linear;
+}
+
+.blurred {
+    filter: blur(16px);
+}
+
 .flex-column {
     display: flex;
     flex-direction: column;
@@ -93,7 +100,11 @@ div.camera img {
     object-fit: cover;
     min-width: calc(var(--camera-size) * 16 * var(--zoom) / 9 );
     animation: 2s zoomIn;
-    transition: --zoom 0.75s;
+    transition: --zoom 0.75s, filter .15s linear;
+}
+
+div.camera img.zoomed {
+    --zoom: 1.8;
 }
 
 .expand {
