@@ -112,7 +112,7 @@ const handleMsg = ({
 
 connection.onOpen(() => console.log('connected'))
 connection.onMessage(({data}) =>
-    handleMsg(tap(JSON.parse(tap(data)))))
+    handleMsg(tap(JSON.parse(data))))
 
 const video: HTMLVideoElement = el('video')
 

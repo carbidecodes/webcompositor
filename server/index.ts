@@ -58,14 +58,12 @@ serve({
     '/ws' :
         handle(
             websocket(ws => {
-                e.on('soundcloud', ({detail}: any) => {
-                    console.log('sc detail', {detail})
-                    send(ws, detail)
+                e.on('soundcloud', (data: any) => {
+                    send(ws, tap(data, 'e.sc'))
                 })
 
-                e.on('command',  ({detail}: any) => {
-                    tap(detail, 'command')
-                    send(ws, { evtName: 'command', data: detail })
+                e.on('command',  (data: any) => {
+                    send(ws, tap({ evtName: 'command', data }, 'e.cmd'))
                 })
 
                 ws.addEventListener(
@@ -89,7 +87,7 @@ serve({
                     })
                 })
 
-                console.log("got ws connection")
+                console.log("WS Connected")
             })
         )
 })
