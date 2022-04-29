@@ -2,7 +2,7 @@
     --unit: 12px;
     --ease: cubic-bezier(.49,0,.37,.99);
     --rate: .25s;
-    --camera-size: 240px;
+
 }
 
 body {
@@ -10,6 +10,7 @@ body {
     font-size: calc(var(--unit)*1.6);
     margin: 0px;
     overflow: hidden;
+    background-color: #000;
 }
 
 div#container {
@@ -38,6 +39,7 @@ div.toast--body {
 
 div.layer {
     position: absolute;
+    background-color: rgba(0,0,0,0);
 }
 
 div.toast img {
@@ -64,19 +66,31 @@ div.toast img {
     animation: fadein var(--rate) var(--ease);
 }
 
-div.camera img {
+div.camera {
+    --camera-size: 240px;
+
     position: absolute;
     top: 0;
     right: 0;
-    border-radius: 50%;
+
+    overflow: hidden;
     width: var(--camera-size);
     height: var(--camera-size);
-    object-fit: cover;
-    object-position: center;
+
+    border-radius: 50%;
     opacity: 99%;
     backdrop-filter: blur(12px);
     border: var(--unit) solid rgba(255,255,255,0.01);
     box-shadow: 0 0 12px 8px rgb(0 0 0 / 8%);
+}
+
+div.camera img {
+    --camera-zoom: 1.6;
+    --camera-input-width: 720px;
+    --camera-image-width: calc(var(--camera-input-width) / var(--camera-zoom));
+
+    width: var(--camera-image-width);
+    margin-left: calc(var(--camera-image-width) / -4);
 }
 
 .expand {

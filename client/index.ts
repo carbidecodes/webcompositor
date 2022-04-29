@@ -91,7 +91,6 @@ connection.onMessage(({data}) =>
     handleMsg(tap(JSON.parse(data))))
 
 const video: HTMLVideoElement = el('video')
-const button = el('button')
 
 type Shortcuts = {
     [key: string] : () => void
@@ -122,9 +121,10 @@ at(root,
     [ at(el('div', 'layer'),
         [ video
         ])
-    , at(el('div', 'layer camera expand'),
-        [ on(el('img'), v => v.src = "http://localhost:8081/video")
-        ])
+    , at(el('div', 'layer expand'),
+        [ at(el('div', 'camera'),
+            [ on(el('img'), v => v.src = "http://localhost:8081/video")
+            ]
+        )])
     , toastRoot
-    , button
     ])
