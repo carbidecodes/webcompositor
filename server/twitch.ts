@@ -28,7 +28,7 @@ export default (commandMap: CommandMap) => {
             const cmd = msg.slice(1).trim()
 
             if (cmd in commandMap) {
-                client.say(channel, '<bot>' + commandMap[cmd](user) + '</bot>')
+                client.say(channel, '#bot ' + commandMap[cmd](user))
             }
         }
     })

@@ -35,12 +35,17 @@ const queryParams = (urlString: string) =>
     new URL(urlString).searchParams
 
 const tClient = twitchInit({
-    current: user => `Adding twitch chat today ${user.username}`,
-    blur: () => {
-        // e.emit('command', 'blur')
+    current:
+        user => `Adding twitch chat today ${user.username}`,
+    blur:
+        () => {
+            // e.emit('command', 'blur')
 
-        return 'nah'
-    }
+            return 'nah'
+        },
+    code:
+        () => 'https://github.com/carbidecodes/webcompositor'
+
 })
 
 serve({
