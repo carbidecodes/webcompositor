@@ -1,14 +1,13 @@
 import * as tmi from 'https://esm.sh/tmi.js'
 import { SMap } from 'common/utils/types.ts'
 import { tap } from 'common/utils/func.ts'
+import { TwitchMessage } from 'common/messages.ts'
 
 type CommandMap = SMap<(_: tmi.Userstate) => string>
 
-type TwitchMessage = {
-    msg: string
-    channel: string
-    username?: string
-}
+
+// export const filterMessage = (msg: TwitchMessage) => {
+// }
 
 export default (commandMap: CommandMap) => {
     const client = tmi.client({
@@ -35,9 +34,9 @@ export default (commandMap: CommandMap) => {
 
     return {
         onMessage: (fn: (_: TwitchMessage) => void) => {
-            client.on('message', (channel, user, msg, _self) => {
+            client.on('message', (channel, user, body, _self) => {
                 fn({
-                    msg,
+                    body,
                     channel,
                     username: user.username
                 })

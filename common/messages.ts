@@ -4,15 +4,19 @@ export type Song = {
     imgUrl: string
 }
 
+export type TwitchMessage = {
+    body: string
+    channel: string
+    username?: string
+}
+
 export type Message =
     | { tag: 'scCurrentSong',
         data: Song
         }
     | { tag: 'twMessage'
-        data: {
-            username?: string,
-            msg: string
-        }}
+        data: TwitchMessage
+        }
     | { tag: 'opCommand'
         data: string
         }
