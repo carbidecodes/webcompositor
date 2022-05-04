@@ -4,7 +4,7 @@ import { tap } from 'common/utils/func.ts'
 
 type CommandMap = SMap<(_: tmi.Userstate) => string>
 
-type OnMessageData = {
+type TwitchMessage = {
     msg: string
     channel: string
     username?: string
@@ -34,7 +34,7 @@ export default (commandMap: CommandMap) => {
     })
 
     return {
-        onMessage: (fn: (_: OnMessageData) => void) => {
+        onMessage: (fn: (_: TwitchMessage) => void) => {
             client.on('message', (channel, user, msg, _self) => {
                 fn({
                     msg,
