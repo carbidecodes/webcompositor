@@ -1,12 +1,12 @@
 import serve from './serve.ts'
 import { handle } from './utils/handler.ts'
 import { websocket } from './utils/upgrade.ts'
-import { tap, effect } from 'common/utils/func.ts'
+import { tap, effect, gate } from 'common/utils/func.ts'
 import { Maybe, isSome } from 'common/utils/types.ts'
 import { Message, Song } from 'common/messages.ts'
 import { pipe } from 'https://esm.sh/@psxcode/compose'
 
-import twitchInit from './twitch.ts'
+import twitchInit, { isNormalMessage } from './twitch.ts'
 
 type State = {
     currentSong: Maybe<Song>
@@ -103,12 +103,16 @@ serve({
                     send(ws, tap({ tag: 'opCommand', data }, 'e.cmd'))
                 })
 
-                twitchClient.onMessage(data => {
-                    send(ws, {
-                        tag: 'twMessage',
-                        data
-                    })
-                })
+                twitchClient.onMessage(
+                    gate(
+                        isNormalMessage,
+                        data => 
+                            send(ws, {
+                                tag: 'twMessage',
+                                data
+                            })
+                    )
+                )
 
                 console.log("Client connected")
             })

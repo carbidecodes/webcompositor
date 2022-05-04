@@ -1,13 +1,23 @@
 import * as tmi from 'https://esm.sh/tmi.js'
-import { SMap } from 'common/utils/types.ts'
-import { tap } from 'common/utils/func.ts'
+import { SMap, isSome, Maybe } from 'common/utils/types.ts'
 import { TwitchMessage } from 'common/messages.ts'
+import { pipe } from 'https://esm.sh/@psxcode/compose'
 
 type CommandMap = SMap<(_: tmi.Userstate) => string>
 
+const canonCommand = (body: string) : Maybe<string> => {
+    if (body.startsWith('!')) {
+        return body.slice(1).trim()
+    }
 
-// export const filterMessage = (msg: TwitchMessage) => {
-// }
+    return null
+}
+
+const isCommand = pipe(canonCommand, isSome)
+const isBotMsg = (body: string) => body.startsWith('#bot')
+
+export const isNormalMessage = ({body}: TwitchMessage) =>
+    !isCommand(body) && !isBotMsg(body)
 
 export default (commandMap: CommandMap) => {
     const client = tmi.client({
@@ -21,10 +31,9 @@ export default (commandMap: CommandMap) => {
     client.connect()
 
     client.on('message', (channel, user, msg, _self) => {
-        tap(msg, 'twitch chat')
-
-        if (msg.startsWith('!')) {
-            const cmd = msg.slice(1).trim()
+        const maybeCmd = canonCommand(msg)
+        if (isSome(maybeCmd)) {
+            const cmd = maybeCmd
 
             if (cmd in commandMap) {
                 client.say(channel, '#bot ' + commandMap[cmd](user))
