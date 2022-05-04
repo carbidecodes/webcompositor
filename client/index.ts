@@ -3,6 +3,7 @@ import { getMediaSource } from './layer.ts'
 import { Create, Read } from './utils/dom.ts'
 import { tap } from 'common/utils/func.ts'
 import { host, port } from 'utils/env.ts'
+import { Message } from 'common/messages.ts'
 
 const MIN_TOAST_TIME = 5000
 
@@ -69,18 +70,12 @@ const showSongToast = (
     { artist: string, title: string, imgUrl: string }
 ) => showToast({titleText: artist, bodyText: title, imgUrl})
 
-const handleMsg = ({
-    evtName,
-    data
-}:{
-    evtName: string,
-    data: any
-}) => {
-    switch (evtName) {
-        case 'currentSong':
-            const toastEl = showSongToast(data)
+const handleMsg = (msg: Message) => {
+    switch (msg.tag) {
+        case 'scCurrentSong':
+            const toastEl = showSongToast(msg.data)
 
-            const chars : number= data.artist.length + data.title.length
+            const chars : number= msg.data.artist.length + msg.data.title.length
             const time = Math.max(chars * 150, MIN_TOAST_TIME)
 
             setTimeout(() => {
@@ -95,16 +90,16 @@ const handleMsg = ({
             }, time)
             break
 
-        case 'twitch_message':
-            tap(data)
+        case 'twMessage':
+            tap(msg.data)
             showToast({
-                titleText: data.username,
-                bodyText: data.msg
+                titleText: msg.data.username || "?",
+                bodyText: msg.data.msg
             })
             break
 
-        case 'command':
-            if (data === 'blur') {
+        case 'opCommand':
+            if (msg.data === 'blur') {
                 video.classList.toggle('blurred')
             }
     }
@@ -147,6 +142,7 @@ document.addEventListener('keyup', async ev => {
 
 const on = <T>(el: T, fn: (_:T) => void) : T => {
     fn(el)
+
     return el
 }
 
