@@ -1,8 +1,8 @@
 import serve from './serve.ts'
-import { respond, handle } from './utils/handler.ts'
+import { handle } from './utils/handler.ts'
 import { websocket } from './utils/upgrade.ts'
 import { tap } from 'common/utils/func.ts'
-import { pipe } from 'https://esm.sh/@psxcode/compose'
+import { Message } from 'common/messages.ts'
 
 import twitchInit from './twitch.ts'
 
@@ -23,7 +23,7 @@ const event = () => {
 
 const e = event()
 
-const send = (ws: WebSocket, data: any) => {
+const send = (ws: WebSocket, data: Message) => {
     if (ws.readyState !== WebSocket.OPEN) {
         console.error('Socket not open')
     } else {
@@ -31,10 +31,7 @@ const send = (ws: WebSocket, data: any) => {
     }
 }
 
-const queryParams = (urlString: string) =>
-    new URL(urlString).searchParams
-
-const tClient = twitchInit({
+const twitchClient = twitchInit({
     current:
         user => `Adding twitch chat today ${user.username}`,
     blur:
@@ -43,56 +40,43 @@ const tClient = twitchInit({
 
             return 'nah'
         },
-    code:
-        () => 'https://github.com/carbidecodes/webcompositor'
+    song:
+        () => {
+            e.emit('command', 'toastSong')
 
+            return 'k'
+        }
 })
 
 serve({
-    '/soundcloud' : respond(req => {
-        // eh
-        const params = queryParams(req.url)
-
-        const title = params.get('title')
-        const artist = params.get('artist')
-
-        e.emit('soundcloud', {evtName: 'currentSong', data: { title, artist }})
-
-        return 'k'
-    }),
-    '/ws' :
-        handle(
+    '/sc': handle(
             websocket(ws => {
-                e.on('soundcloud', (data: any) => {
+                ws.addEventListener(
+                    'message',
+                    ({data}) => e.emit('soundcloud', tap(JSON.parse(data)))
+                )
+
+                console.log('sc extension connected')
+            })
+        ),
+    '/client': handle(
+            websocket(ws => {
+                e.on('soundcloud', (data: Message) => {
                     send(ws, tap(data, 'e.sc'))
                 })
 
-                e.on('command',  (data: any) => {
-                    send(ws, tap({ evtName: 'command', data }, 'e.cmd'))
+                e.on('command',  (data: Message) => {
+                    send(ws, tap({ tag: 'opCommand', data }, 'e.cmd'))
                 })
 
-                ws.addEventListener(
-                    'message',
-                    pipe(
-                        ({data}) => data,
-                        JSON.parse,
-                        tap,
-                        data =>
-                            e.emit('soundcloud', {
-                                evtName: 'currentSong',
-                                data
-                            })
-                    )
-                )
-
-                tClient.onMessage(data => {
+                twitchClient.onMessage(data => {
                     send(ws, {
-                        evtName: 'twitch_message',
+                        tag: 'twMessage',
                         data
                     })
                 })
 
-                console.log("WS Connected")
+                console.log("Client connected")
             })
         )
 })

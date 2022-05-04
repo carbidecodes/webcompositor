@@ -1,6 +1,7 @@
 import { init } from '/channel/connection.ts'
 import { Read } from 'utils/dom.ts'
 import { tap } from 'common/utils/func.ts'
+import { Message } from 'common/messages.ts'
 
 import { pipe } from 'https://esm.sh/@psxcode/compose'
 
@@ -23,12 +24,19 @@ const extract = (node: Element) => {
     }
 }
 
+const asMessage = (data: ReturnType<typeof extract>) : Message => {
+    return {
+        tag: 'scCurrentSong',
+        data
+    }
+}
+
 const tapA = (x: any, label = '') => tap(x, 'asdf - ' + label)
 
 const connect = async () => {
     const { a } = await window.chrome.storage.sync.get('a')
 
-    const connection = init({host: 'localhost', port: a ? 8002 : 8001})
+    const connection = init({host: 'localhost', port: a ? 8002 : 8001, endpoint: 'sc'})
 
     connection.onOpen(() => console.log('connected.'))
     connection.onMessage(tap)
@@ -45,6 +53,7 @@ const connect = async () => {
         if (record.type === 'childList') {
             pipe(
                 extract,
+                asMessage,
                 tapA,
                 JSON.stringify,
                 connection.send

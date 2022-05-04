@@ -11,7 +11,7 @@ const { select } = Read
 
 const root = select('div#container')
 
-const connection = init({host, port})
+const connection = init({host, port, endpoint: 'client'})
 
 const toastRoot = el('div', 'layer flex-column')
 

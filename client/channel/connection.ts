@@ -1,8 +1,10 @@
 import { type Action } from 'common/utils/types.ts'
 
-export const init = ({host, port}: {host: string, port: number}) => {
-    const endpoint = `ws://${host}:${port}/ws`
-    const ws = new WebSocket(endpoint)
+export const init =
+    ({host, port, endpoint}:
+    {host: string, port: number, endpoint: string}) => {
+    const url = `ws://${host}:${port}/${endpoint}`
+    const ws = new WebSocket(url)
 
     return {
         onOpen: (fn: Action<void>) => ws.addEventListener('open', () => fn()),
