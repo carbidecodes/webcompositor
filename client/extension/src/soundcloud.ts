@@ -1,13 +1,13 @@
 import { init } from '/channel/connection.ts'
 import { Read } from 'utils/dom.ts'
 import { tap } from 'common/utils/func.ts'
-import { Message } from 'common/messages.ts'
+import { Song } from 'common/messages.ts' 
 
 import { pipe } from 'https://esm.sh/@psxcode/compose'
 
 const { select, observe, query, text } = Read
 
-const extract = (node: Element) => {
+const extract = (node: Element) : Song => {
     let q = query(node)
 
     const cleanUrlString // url("foo") => 'foo'
@@ -21,13 +21,6 @@ const extract = (node: Element) => {
         artist: text(q<HTMLAnchorElement>('a.sc-link-secondary')!),
         title: text(q<HTMLSpanElement>('a.sc-link-primary span[aria-hidden=true]')!),
         imgUrl: cleanUrlString(q<HTMLSpanElement>('div.image span')!.style.backgroundImage)
-    }
-}
-
-const asMessage = (data: ReturnType<typeof extract>) : Message => {
-    return {
-        tag: 'scCurrentSong',
-        data
     }
 }
 
@@ -53,7 +46,6 @@ const connect = async () => {
         if (record.type === 'childList') {
             pipe(
                 extract,
-                asMessage,
                 tapA,
                 JSON.stringify,
                 connection.send

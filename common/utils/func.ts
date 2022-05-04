@@ -4,5 +4,10 @@ export const tap = (x: any, label?: string) => {
     return x
 }
 
+export const effect = <T>(fn: (_:T) => void) => (x: T) => {
+    fn(x)
+    return x
+}
+
 export const compose =
     <R,T,U>(f: (_:R)=> T, g: (_:T) => U) => (x: R) => g(f(x))

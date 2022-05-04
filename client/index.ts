@@ -99,8 +99,10 @@ const handleMsg = (msg: Message) => {
             break
 
         case 'opCommand':
-            if (msg.data === 'blur') {
-                video.classList.toggle('blurred')
+            switch (msg.data) {
+                case 'blur':
+                    video.classList.toggle('blurred')
+                    break;
             }
     }
 }

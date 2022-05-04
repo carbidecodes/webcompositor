@@ -1,10 +1,13 @@
+export type Song = {
+    artist: string,
+    title: string,
+    imgUrl: string
+}
+
 export type Message =
     | { tag: 'scCurrentSong',
-        data: {
-            artist: string,
-            title: string,
-            imgUrl: string
-        }}
+        data: Song
+        }
     | { tag: 'twMessage'
         data: {
             username?: string,

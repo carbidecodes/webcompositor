@@ -1,18 +1,34 @@
 import serve from './serve.ts'
 import { handle } from './utils/handler.ts'
 import { websocket } from './utils/upgrade.ts'
-import { tap } from 'common/utils/func.ts'
-import { Message } from 'common/messages.ts'
+import { tap, effect } from 'common/utils/func.ts'
+import { Maybe, isSome } from 'common/utils/types.ts'
+import { Message, Song } from 'common/messages.ts'
+import { pipe } from 'https://esm.sh/@psxcode/compose'
 
 import twitchInit from './twitch.ts'
+
+type State = {
+    currentSong: Maybe<Song>
+}
+
+const state: State = {
+    currentSong: null
+}
+
+const transition = {
+    newSong: (song: Song) => state.currentSong = song
+}
 
 const event = () => {
     const evt = new EventTarget()
 
-    return {
-        emit: (evName: string, data: any) =>
-            evt.dispatchEvent(new CustomEvent(evName, {detail: data})),
+    const emit = (evName: string, data: any) =>
+        evt.dispatchEvent(new CustomEvent(evName, {detail: data}))
 
+    return {
+        emit,
+        emitF: (evName: string) => (data: any) => emit(evName, data),
         on: (evName: string, handle: any) => {
             const handler = ({detail}: any) => handle(detail)
 
@@ -42,18 +58,36 @@ const twitchClient = twitchInit({
         },
     song:
         () => {
-            e.emit('command', 'toastSong')
+            if (isSome(state.currentSong)) {
+                e.emit('soundcloud', songAsMessage(state.currentSong))
 
-            return 'k'
+                return `${state.currentSong?.artist} - ${state.currentSong?.title}`
+            } else {
+                return 'Nothing yet!'
+            }
         }
 })
+
+const songAsMessage = (data: Song) : Message => {
+    return {
+        tag: 'scCurrentSong',
+        data
+    }
+}
 
 serve({
     '/sc': handle(
             websocket(ws => {
                 ws.addEventListener(
                     'message',
-                    ({data}) => e.emit('soundcloud', tap(JSON.parse(data)))
+                    pipe(
+                        ({data}) => data,
+                        JSON.parse,
+                        effect(transition.newSong),
+                        songAsMessage,
+                        tap,
+                        e.emitF('soundcloud')
+                    )
                 )
 
                 console.log('sc extension connected')
